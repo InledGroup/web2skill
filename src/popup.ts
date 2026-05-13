@@ -29,18 +29,27 @@ themeToggle.addEventListener('click', () => {
   chrome.storage.local.set({ theme });
 });
 
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  const activeTab = tabs[0];
-  if (activeTab?.id) {
-    chrome.tabs.sendMessage(activeTab.id, { action: 'detectNav' }, (response: any) => {
-      if (chrome.runtime.lastError) {
-        statusText.innerText = 'Error: Please reload the page';
-        return;
-      }
-      handleResponse(response);
-    });
-  }
-});
+function initScanner() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0];
+    if (activeTab?.id) {
+      chrome.tabs.sendMessage(activeTab.id, { action: 'detectNav' }, (response: any) => {
+        if (chrome.runtime.lastError) {
+          statusText.innerHTML = 'Requirement: Please <a href="#" id="reload-link" style="color: var(--accent); text-decoration: underline;">reload the page</a> to enable scanning.';
+          document.getElementById('reload-link')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            chrome.tabs.reload(activeTab.id!);
+            window.close();
+          });
+          return;
+        }
+        handleResponse(response);
+      });
+    }
+  });
+}
+
+initScanner();
 
 function handleResponse(response: any) {
   if (response && response.links && response.links.length > 0) {
@@ -60,7 +69,7 @@ function renderLinks(links: { title: string; url: string }[]) {
     div.className = 'link-item';
     div.innerHTML = `
       <input type="checkbox" id="link-${index}" checked data-url="${link.url}" data-title="${link.title}">
-      <label for="link-${index}">${link.title}</label>
+      <label for="link-${index}" title="${link.url}">${link.title}</label>
     `;
     linkList.appendChild(div);
   });

@@ -4,15 +4,13 @@ let instructionBanner: HTMLDivElement | null = null;
 
 chrome.runtime.onMessage.addListener((request: any, _sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   if (request.action === 'detectNav') {
-    // First, try to expand hidden menus
     autoExpandNav();
     
-    // Small delay to allow potential DOM updates after expansion
     setTimeout(() => {
       const navLinks = detectNavigationLinks();
       sendResponse({ links: navLinks });
-    }, 100);
-    return true; // Keep channel open for async response
+    }, 150);
+    return true;
   } else if (request.action === 'startManualSelect') {
     startManualSelection();
     sendResponse({ success: true });
@@ -20,10 +18,9 @@ chrome.runtime.onMessage.addListener((request: any, _sender: chrome.runtime.Mess
 });
 
 function autoExpandNav() {
-  // Find common documentation toggle elements
   const toggles = document.querySelectorAll([
     '[aria-expanded="false"]',
-    '.menu__list-item-collapsible > .menu__link--sublist-caret', // Docusaurus
+    '.menu__list-item-collapsible > .menu__link--sublist-caret',
     '.sidebar-item-toggle',
     '.nav-item-toggle',
     '.collapsible-toggle',
@@ -32,9 +29,7 @@ function autoExpandNav() {
 
   toggles.forEach(toggle => {
     try {
-      if (toggle instanceof HTMLElement) {
-        toggle.click();
-      }
+      if (toggle instanceof HTMLElement) toggle.click();
     } catch (e) {}
   });
 }
@@ -83,12 +78,32 @@ function detectNavigationLinks(element: Element | Document = document) {
 }
 
 function extractLinks(container: Element) {
-  // Use textContent instead of innerText to find hidden links
   const links = Array.from(container.querySelectorAll('a'))
-    .map(a => ({
-      title: (a.textContent || a.getAttribute('aria-label') || (a as HTMLAnchorElement).href).trim(),
-      url: (a as HTMLAnchorElement).href
-    }))
+    .map(a => {
+      const url = (a as HTMLAnchorElement).href;
+      let title = '';
+      
+      // Try multiple sources for the title
+      title = (a.textContent || a.getAttribute('aria-label') || a.getAttribute('title') || '').trim();
+      
+      // If still empty or just whitespace, use the URL path
+      if (!title || title.length < 2) {
+        try {
+          const urlObj = new URL(url);
+          const pathSegments = urlObj.pathname.split('/').filter(s => s.length > 0);
+          if (pathSegments.length > 0) {
+            title = pathSegments[pathSegments.length - 1]
+              .replace(/\.html?$/i, '')
+              .replace(/[-_]/g, ' ')
+              .replace(/\b\w/g, l => l.toUpperCase());
+          }
+        } catch (e) {}
+      }
+      
+      if (!title) title = url;
+
+      return { title, url };
+    })
     .filter(link => {
       try {
         if (!link.url || link.url.startsWith('javascript:')) return false;
@@ -153,14 +168,13 @@ function startManualSelection() {
     e.stopPropagation();
     
     const target = e.target as HTMLElement;
-    // Auto-expand within the selected element too
     autoExpandNavInside(target);
     
     setTimeout(() => {
       const links = extractLinks(target);
       cleanup();
       chrome.runtime.sendMessage({ action: 'manualLinksDetected', links });
-    }, 100);
+    }, 150);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
