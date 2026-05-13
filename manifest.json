@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Web2Skill - Doc to Markdown",
+  "version": "1.0.0",
+  "description": "Convert documentation websites to Markdown and export as ZIP.",
+  "permissions": ["activeTab", "scripting", "downloads", "storage"],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.ts"]
+    }
+  ]
+}
