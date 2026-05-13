@@ -4,13 +4,40 @@ let instructionBanner: HTMLDivElement | null = null;
 
 chrome.runtime.onMessage.addListener((request: any, _sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   if (request.action === 'detectNav') {
-    const navLinks = detectNavigationLinks();
-    sendResponse({ links: navLinks });
+    // First, try to expand hidden menus
+    autoExpandNav();
+    
+    // Small delay to allow potential DOM updates after expansion
+    setTimeout(() => {
+      const navLinks = detectNavigationLinks();
+      sendResponse({ links: navLinks });
+    }, 100);
+    return true; // Keep channel open for async response
   } else if (request.action === 'startManualSelect') {
     startManualSelection();
     sendResponse({ success: true });
   }
 });
+
+function autoExpandNav() {
+  // Find common documentation toggle elements
+  const toggles = document.querySelectorAll([
+    '[aria-expanded="false"]',
+    '.menu__list-item-collapsible > .menu__link--sublist-caret', // Docusaurus
+    '.sidebar-item-toggle',
+    '.nav-item-toggle',
+    '.collapsible-toggle',
+    '.expand-icon'
+  ].join(','));
+
+  toggles.forEach(toggle => {
+    try {
+      if (toggle instanceof HTMLElement) {
+        toggle.click();
+      }
+    } catch (e) {}
+  });
+}
 
 function detectNavigationLinks(element: Element | Document = document) {
   const selectors = [
@@ -56,9 +83,10 @@ function detectNavigationLinks(element: Element | Document = document) {
 }
 
 function extractLinks(container: Element) {
+  // Use textContent instead of innerText to find hidden links
   const links = Array.from(container.querySelectorAll('a'))
     .map(a => ({
-      title: (a.innerText || a.getAttribute('aria-label') || (a as HTMLAnchorElement).href).trim(),
+      title: (a.textContent || a.getAttribute('aria-label') || (a as HTMLAnchorElement).href).trim(),
       url: (a as HTMLAnchorElement).href
     }))
     .filter(link => {
@@ -125,10 +153,14 @@ function startManualSelection() {
     e.stopPropagation();
     
     const target = e.target as HTMLElement;
-    const links = extractLinks(target);
+    // Auto-expand within the selected element too
+    autoExpandNavInside(target);
     
-    cleanup();
-    chrome.runtime.sendMessage({ action: 'manualLinksDetected', links });
+    setTimeout(() => {
+      const links = extractLinks(target);
+      cleanup();
+      chrome.runtime.sendMessage({ action: 'manualLinksDetected', links });
+    }, 100);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -152,4 +184,11 @@ function startManualSelection() {
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('click', onClick, true);
   document.addEventListener('keydown', onKeyDown);
+}
+
+function autoExpandNavInside(element: HTMLElement) {
+  const toggles = element.querySelectorAll('[aria-expanded="false"], .menu__link--sublist-caret, .sidebar-item-toggle');
+  toggles.forEach(toggle => {
+    if (toggle instanceof HTMLElement) toggle.click();
+  });
 }
