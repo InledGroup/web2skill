@@ -6,6 +6,7 @@ import JSZip from 'jszip';
 const linkList = document.getElementById('link-list')!;
 const exportBtn = document.getElementById('export-btn') as HTMLButtonElement;
 const manualBtn = document.getElementById('manual-btn') as HTMLButtonElement;
+const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement;
 const statusText = document.getElementById('status')!;
 const progressContainer = document.getElementById('progress-container')!;
 const progressFill = document.getElementById('progress-fill')!;
@@ -13,6 +14,7 @@ const progressLabel = document.getElementById('progress-text')!;
 const themeToggle = document.getElementById('theme-toggle') as HTMLButtonElement;
 
 let detectedLinks: { title: string; url: string }[] = [];
+let abortController: AbortController | null = null;
 
 // Theme Management
 chrome.storage.local.get(['theme'], (result) => {
@@ -106,22 +108,40 @@ exportBtn.addEventListener('click', async () => {
 
   exportBtn.disabled = true;
   manualBtn.disabled = true;
+  exportBtn.style.display = 'none';
+  cancelBtn.style.display = 'block';
   progressContainer.style.display = 'block';
   
+  abortController = new AbortController();
+  
   try {
-    await runExport(selectedLinks);
+    await runExport(selectedLinks, abortController.signal);
     statusText.innerText = 'Export completed!';
     progressLabel.innerText = '100% - Success';
   } catch (err: any) {
-    statusText.innerText = 'Error: ' + err.message;
-    progressFill.style.backgroundColor = '#ef4444';
+    if (err.name === 'AbortError') {
+      statusText.innerText = 'Export cancelled by user';
+      progressLabel.innerText = 'Cancelled';
+    } else {
+      statusText.innerText = 'Error: ' + err.message;
+      progressFill.style.backgroundColor = '#ef4444';
+    }
   } finally {
     exportBtn.disabled = false;
     manualBtn.disabled = false;
+    exportBtn.style.display = 'block';
+    cancelBtn.style.display = 'none';
+    abortController = null;
   }
 });
 
-async function runExport(links: { title: string, url: string }[]) {
+cancelBtn.addEventListener('click', () => {
+  if (abortController) {
+    abortController.abort();
+  }
+});
+
+async function runExport(links: { title: string, url: string }[], signal: AbortSignal) {
   const zip = new JSZip();
   const turndown = new TurndownService();
   const total = links.length;
@@ -134,35 +154,44 @@ async function runExport(links: { title: string, url: string }[]) {
   });
 
   for (let i = 0; i < links.length; i++) {
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    
     const link = links[i];
     const percent = Math.round(((i + 1) / total) * 100);
     
     updateProgress(percent, `Downloading: ${link.title}`);
 
-    const response = await fetch(link.url);
-    const html = await response.text();
-    
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    const base = new URL(link.url);
-    doc.querySelectorAll('a').forEach(a => {
-      try {
-        const href = a.getAttribute('href');
-        if (href) a.href = new URL(href, base).href;
-      } catch(e) {}
-    });
+    try {
+      const response = await fetch(link.url, { signal });
+      const html = await response.text();
+      
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      const base = new URL(link.url);
+      doc.querySelectorAll('a').forEach(a => {
+        try {
+          const href = a.getAttribute('href');
+          if (href) a.href = new URL(href, base).href;
+        } catch(e) {}
+      });
 
-    const reader = new Readability(doc);
-    const article = reader.parse();
-    
-    if (article && article.content) {
-      let markdown = turndown.turndown(article.content);
-      markdown = processLinks(markdown, urlMap);
-      zip.file(urlMap[link.url], `# ${article.title}\n\n${markdown}${footer}`);
+      const reader = new Readability(doc);
+      const article = reader.parse();
+      
+      if (article && article.content) {
+        let markdown = turndown.turndown(article.content);
+        markdown = processLinks(markdown, urlMap);
+        zip.file(urlMap[link.url], `# ${article.title}\n\n${markdown}${footer}`);
+      }
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw e;
+      console.error(`Failed to fetch ${link.url}`, e);
     }
   }
 
+  if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  
   updateProgress(99, 'Generating ZIP file...');
   const content = await zip.generateAsync({ type: 'blob' });
   
