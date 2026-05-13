@@ -18,7 +18,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   if (activeTab?.id) {
     chrome.tabs.sendMessage(activeTab.id, { action: 'detectNav' }, (response: any) => {
       if (chrome.runtime.lastError) {
-        statusText.innerText = 'Error: Recarga la página e intenta de nuevo.';
+        statusText.innerText = 'Error: Please reload the page and try again.';
         return;
       }
       handleResponse(response);
@@ -30,10 +30,10 @@ function handleResponse(response: any) {
   if (response && response.links && response.links.length > 0) {
     detectedLinks = response.links;
     renderLinks(detectedLinks);
-    statusText.innerText = `${detectedLinks.length} páginas detectadas.`;
+    statusText.innerText = `${detectedLinks.length} pages detected.`;
     exportBtn.disabled = false;
   } else {
-    statusText.innerText = 'No se detectó ningún índice claro.';
+    statusText.innerText = 'No clear navigation index found.';
   }
 }
 
@@ -75,7 +75,7 @@ exportBtn.addEventListener('click', async () => {
   }));
 
   if (selectedLinks.length === 0) {
-    alert('Selecciona al menos una página.');
+    alert('Please select at least one page.');
     return;
   }
 
@@ -85,11 +85,11 @@ exportBtn.addEventListener('click', async () => {
   
   try {
     await runExport(selectedLinks);
-    statusText.innerText = '¡Exportación completada!';
-    progressLabel.innerText = '100% - Descargado';
+    statusText.innerText = 'Export completed successfully!';
+    progressLabel.innerText = '100% - Done';
   } catch (err: any) {
     statusText.innerText = 'Error: ' + err.message;
-    progressFill.style.backgroundColor = '#dc3545';
+    progressFill.style.backgroundColor = '#ef4444';
   } finally {
     exportBtn.disabled = false;
     manualBtn.disabled = false;
@@ -100,6 +100,7 @@ async function runExport(links: { title: string, url: string }[]) {
   const zip = new JSZip();
   const turndown = new TurndownService();
   const total = links.length;
+  const footer = "\n\n---\nCreated with web2skill, from [Inled Group](https://inled.es)";
   
   const urlMap: Record<string, string> = {};
   links.forEach((link, i) => {
@@ -111,7 +112,7 @@ async function runExport(links: { title: string, url: string }[]) {
     const link = links[i];
     const percent = Math.round(((i + 1) / total) * 100);
     
-    updateProgress(percent, `Procesando: ${link.title}`);
+    updateProgress(percent, `Processing: ${link.title}`);
 
     const response = await fetch(link.url);
     const html = await response.text();
@@ -133,11 +134,11 @@ async function runExport(links: { title: string, url: string }[]) {
     if (article && article.content) {
       let markdown = turndown.turndown(article.content);
       markdown = processLinks(markdown, urlMap);
-      zip.file(urlMap[link.url], `# ${article.title}\n\n${markdown}`);
+      zip.file(urlMap[link.url], `# ${article.title}\n\n${markdown}${footer}`);
     }
   }
 
-  updateProgress(99, 'Generando archivo ZIP...');
+  updateProgress(99, 'Generating ZIP file...');
   const content = await zip.generateAsync({ type: 'blob' });
   
   const url = URL.createObjectURL(content);

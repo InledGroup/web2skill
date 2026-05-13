@@ -5,117 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Web2Skill</title>
     <style>
+      :root {
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --bg: #ffffff;
+        --secondary-bg: #f8fafc;
+        --text: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --radius: 8px;
+        --success: #10b981;
+      }
       body {
-        width: 350px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding: 15px;
+        width: 360px;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        padding: 0;
         margin: 0;
-        background-color: #f8f9fa;
+        background-color: var(--bg);
+        color: var(--text);
       }
-      h3 {
-        margin-top: 0;
-        color: #343a40;
-        border-bottom: 2px solid #007bff;
-        padding-bottom: 5px;
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        background-color: var(--secondary-bg);
       }
-      p {
-        font-size: 14px;
-        color: #6c757d;
-        margin: 10px 0;
+      .header img {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+      }
+      .header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+      .content {
+        padding: 16px;
+      }
+      #status {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin: 0 0 12px 0;
+        line-height: 1.4;
       }
       #link-list {
-        max-height: 200px;
+        max-height: 220px;
         overflow-y: auto;
-        border: 1px solid #dee2e6;
-        background-color: white;
-        margin: 10px 0;
-        padding: 8px;
-        border-radius: 4px;
+        border: 1px solid var(--border);
+        background-color: var(--bg);
+        margin-bottom: 16px;
+        padding: 4px;
+        border-radius: var(--radius);
       }
       .link-item {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
+        padding: 8px 12px;
+        margin-bottom: 2px;
         font-size: 13px;
+        border-radius: 6px;
+        transition: background-color 0.15s;
+      }
+      .link-item:hover {
+        background-color: var(--secondary-bg);
       }
       .link-item input {
+        width: 16px;
+        height: 16px;
         margin-right: 12px;
         cursor: pointer;
+        accent-color: var(--primary);
       }
       .link-item label {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         cursor: pointer;
+        font-weight: 500;
       }
       .progress-container {
         display: none;
-        margin: 15px 0;
+        margin-bottom: 16px;
+        background: var(--secondary-bg);
+        padding: 12px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
       }
       .progress-bar {
         width: 100%;
-        height: 12px;
-        background-color: #e9ecef;
-        border-radius: 6px;
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
         overflow: hidden;
       }
       #progress-fill {
         width: 0%;
         height: 100%;
-        background-color: #28a745;
-        transition: width 0.3s;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+      }
+      #progress-text {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-align: center;
+        margin: 8px 0 0 0;
       }
       .actions {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
       }
       button {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: none;
-        border-radius: 4px;
+        border-radius: var(--radius);
         cursor: pointer;
+        font-size: 14px;
         font-weight: 600;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
       }
       #export-btn {
-        background-color: #007bff;
+        background-color: var(--primary);
         color: white;
       }
       #export-btn:hover:not(:disabled) {
-        background-color: #0056b3;
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
       }
       #manual-btn {
-        background-color: #6c757d;
-        color: white;
+        background-color: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
       }
       #manual-btn:hover:not(:disabled) {
-        background-color: #5a6268;
+        background-color: var(--secondary-bg);
+        border-color: #cbd5e1;
       }
       button:disabled {
-        background-color: #ced4da;
+        opacity: 0.6;
         cursor: not-allowed;
+      }
+      .footer {
+        padding: 12px 16px;
+        font-size: 11px;
+        text-align: center;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+      }
+      .footer a {
+        color: var(--primary);
+        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <h3>Web2Skill</h3>
-    <p id="status">Detectando índice...</p>
+    <div class="header">
+      <img src="w2s.png" alt="W2S">
+      <h3>Web2Skill</h3>
+    </div>
     
-    <div id="link-list"></div>
-    
-    <div class="progress-container" id="progress-container">
-      <div class="progress-bar">
-        <div id="progress-fill"></div>
+    <div class="content">
+      <p id="status">Detecting navigation links...</p>
+      
+      <div id="link-list"></div>
+      
+      <div class="progress-container" id="progress-container">
+        <div class="progress-bar">
+          <div id="progress-fill"></div>
+        </div>
+        <p id="progress-text">0%</p>
       </div>
-      <p id="progress-text" style="font-size: 11px; text-align: center; margin-top: 5px;">0%</p>
+
+      <div class="actions">
+        <button id="export-btn" disabled>Export Selection</button>
+        <button id="manual-btn">Manual Selection</button>
+      </div>
     </div>
 
-    <div class="actions">
-      <button id="export-btn" disabled>Exportar Seleccionados</button>
-      <button id="manual-btn">Selección Manual</button>
+    <div class="footer">
+      From <a href="https://inled.es" target="_blank">Inled Group</a>
     </div>
+
     <script type="module" src="/src/popup.ts"></script>
   </body>
 </html>

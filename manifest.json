@@ -5,7 +5,11 @@
   "description": "Convert documentation websites to Markdown and export as ZIP.",
   "permissions": ["activeTab", "scripting", "downloads", "storage"],
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html",
+    "default_icon": "w2s.png"
+  },
+  "icons": {
+    "128": "w2s.png"
   },
   "background": {
     "service_worker": "src/background.ts",
