@@ -6,38 +6,38 @@
     <title>Web2Skill</title>
     <style>
       :root {
-        /* W2S Logo Inspired Theme (Default) */
-        --w2s-bg: #000000;
-        --w2s-header: #0a0a0a;
-        --w2s-text: #ffffff;
-        --w2s-text-muted: #888888;
-        --w2s-accent: #ffffff;
-        --w2s-border: #333333;
-        --w2s-radius: 0px; /* Blocky/Pixel style */
-        --w2s-font-header: 'Courier New', Courier, monospace;
-        --w2s-font-body: 'Courier New', Courier, monospace;
+        /* W2S Logo Inspired Theme (Default Terminal) */
+        --terminal-bg: #000000;
+        --terminal-header: #0a0a0a;
+        --terminal-text: #ffffff;
+        --terminal-text-muted: #888888;
+        --terminal-accent: #ffffff;
+        --terminal-border: #333333;
+        --terminal-radius: 0px;
+        --terminal-font-header: 'Courier New', Courier, monospace;
+        --terminal-font-body: 'Courier New', Courier, monospace;
 
-        /* Light Theme */
+        /* First Commit Style (Light Theme) */
         --light-bg: #ffffff;
         --light-header: #f8fafc;
-        --light-text: #0f172a;
+        --light-text: #1e293b;
         --light-text-muted: #64748b;
-        --light-accent: #000000;
+        --light-accent: #2563eb;
         --light-border: #e2e8f0;
-        --light-radius: 4px;
-        --light-font-header: system-ui, sans-serif;
-        --light-font-body: system-ui, sans-serif;
+        --light-radius: 8px;
+        --light-font-header: 'Inter', system-ui, sans-serif;
+        --light-font-body: 'Inter', system-ui, sans-serif;
 
         /* Active Vars */
-        --bg: var(--w2s-bg);
-        --header-bg: var(--w2s-header);
-        --text: var(--w2s-text);
-        --text-muted: var(--w2s-text-muted);
-        --accent: var(--w2s-accent);
-        --border: var(--w2s-border);
-        --radius: var(--w2s-radius);
-        --font-header: var(--w2s-font-header);
-        --font-body: var(--w2s-font-body);
+        --bg: var(--terminal-bg);
+        --header-bg: var(--terminal-header);
+        --text: var(--terminal-text);
+        --text-muted: var(--terminal-text-muted);
+        --accent: var(--terminal-accent);
+        --border: var(--terminal-border);
+        --radius: var(--terminal-radius);
+        --font-header: var(--terminal-font-header);
+        --font-body: var(--terminal-font-body);
       }
 
       body.light-theme {
@@ -88,18 +88,18 @@
         font-family: var(--font-header);
         font-size: 18px;
         font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
       }
 
       #theme-toggle {
-        font-size: 9px;
+        font-size: 10px;
         background: transparent;
         border: 1px solid var(--border);
         color: var(--text-muted);
-        padding: 4px 8px;
+        padding: 5px 10px;
         cursor: pointer;
-        text-transform: uppercase;
+        border-radius: var(--radius);
+        font-family: var(--font-body);
       }
 
       .content {
@@ -107,7 +107,7 @@
       }
 
       #status {
-        font-size: 12px;
+        font-size: 13px;
         margin: 0 0 14px 0;
         color: var(--text);
         border-left: 3px solid var(--accent);
@@ -121,17 +121,20 @@
         margin-bottom: 16px;
         padding: 4px;
         background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius);
+      }
+
+      body.light-theme #link-list {
+        background: #ffffff;
       }
 
       .link-item {
         display: flex;
         align-items: center;
-        padding: 8px 10px;
-        font-size: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-      .link-item:last-child {
-        border-bottom: none;
+        padding: 8px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        margin-bottom: 2px;
       }
       .link-item:hover {
         background: rgba(255, 255, 255, 0.08);
@@ -151,6 +154,8 @@
         margin-bottom: 16px;
         padding: 12px;
         border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: rgba(255,255,255,0.02);
       }
 
       .progress-bar {
@@ -158,6 +163,7 @@
         height: 6px;
         background-color: var(--border);
         overflow: hidden;
+        border-radius: 3px;
       }
 
       #progress-fill {
@@ -167,7 +173,7 @@
       }
 
       #progress-text {
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
         margin-top: 8px;
       }
@@ -185,10 +191,11 @@
         background: transparent;
         color: var(--accent);
         font-family: var(--font-header);
-        font-size: 13px;
-        font-weight: 900;
+        font-size: 14px;
+        font-weight: 700;
         cursor: pointer;
-        text-transform: uppercase;
+        border-radius: var(--radius);
+        transition: all 0.2s;
       }
 
       button.main-btn:hover:not(:disabled) {
@@ -196,24 +203,38 @@
         color: var(--bg);
       }
 
+      #export-btn {
+        background: var(--accent);
+        color: var(--bg);
+      }
+      #export-btn:hover:not(:disabled) {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
       #manual-btn {
+        background: transparent;
         border-color: var(--text-muted);
         color: var(--text-muted);
       }
       #manual-btn:hover:not(:disabled) {
         border-color: var(--text);
         color: var(--text);
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      body.light-theme #manual-btn:hover:not(:disabled) {
+        background: #f8fafc;
+        border-color: #cbd5e1;
       }
 
       button:disabled {
-        opacity: 0.2;
+        opacity: 0.3;
         cursor: not-allowed;
       }
 
       .footer {
         padding: 12px;
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
         color: var(--text-muted);
         border-top: 1px solid var(--border);
@@ -221,7 +242,6 @@
       .footer a {
         color: var(--accent);
         text-decoration: none;
-        border-bottom: 1px solid var(--text-muted);
       }
 
       #selection-banner {
@@ -234,9 +254,10 @@
         color: var(--bg);
         padding: 12px;
         text-align: center;
-        font-size: 12px;
-        font-weight: 900;
+        font-size: 13px;
+        font-weight: 700;
         z-index: 100;
+        font-family: var(--font-body);
       }
     </style>
   </head>
@@ -244,13 +265,13 @@
     <div class="header">
       <div class="header-left">
         <img src="w2s.png" alt="W2S">
-        <h3>WEB2SKILL</h3>
+        <h3>Web2Skill</h3>
       </div>
-      <button id="theme-toggle">LIGHT_MODE</button>
+      <button id="theme-toggle">Light Mode</button>
     </div>
     
     <div class="content">
-      <p id="status">SCANNING_DOCS...</p>
+      <p id="status">Scanning documentation...</p>
       
       <div id="link-list"></div>
       
@@ -262,17 +283,17 @@
       </div>
 
       <div class="actions">
-        <button id="export-btn" class="main-btn" disabled>EXPORT_ZIP</button>
-        <button id="manual-btn" class="main-btn">SELECT_MANUALLY</button>
+        <button id="export-btn" class="main-btn" disabled>Export Selection</button>
+        <button id="manual-btn" class="main-btn">Manual Selection</button>
       </div>
     </div>
 
     <div class="footer">
-      BY <a href="https://inled.es" target="_blank">INLED GROUP</a> | V1.0
+      From <a href="https://inled.es" target="_blank">Inled Group</a>
     </div>
 
     <div id="selection-banner">
-      SELECT TARGET ELEMENT
+      CLICK TO SELECT NAVIGATION ELEMENT
     </div>
 
     <script type="module" src="/src/popup.ts"></script>

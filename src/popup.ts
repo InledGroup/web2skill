@@ -34,7 +34,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   if (activeTab?.id) {
     chrome.tabs.sendMessage(activeTab.id, { action: 'detectNav' }, (response: any) => {
       if (chrome.runtime.lastError) {
-        statusText.innerText = 'ERROR: RELOAD PAGE';
+        statusText.innerText = 'Error: Please reload the page';
         return;
       }
       handleResponse(response);
@@ -46,10 +46,10 @@ function handleResponse(response: any) {
   if (response && response.links && response.links.length > 0) {
     detectedLinks = response.links;
     renderLinks(detectedLinks);
-    statusText.innerText = `${detectedLinks.length} NODES DETECTED`;
+    statusText.innerText = `${detectedLinks.length} pages detected`;
     exportBtn.disabled = false;
   } else {
-    statusText.innerText = 'SCAN FAILED: NO INDEX DETECTED';
+    statusText.innerText = 'No navigation index found';
   }
 }
 
@@ -91,7 +91,7 @@ exportBtn.addEventListener('click', async () => {
   }));
 
   if (selectedLinks.length === 0) {
-    alert('SELECT AT LEAST ONE NODE');
+    alert('Please select at least one page');
     return;
   }
 
@@ -101,11 +101,11 @@ exportBtn.addEventListener('click', async () => {
   
   try {
     await runExport(selectedLinks);
-    statusText.innerText = 'EXPORT SUCCESSFUL';
-    progressLabel.innerText = '100% - COMPLETED';
+    statusText.innerText = 'Export completed!';
+    progressLabel.innerText = '100% - Success';
   } catch (err: any) {
-    statusText.innerText = 'CRITICAL ERROR: ' + err.message;
-    progressFill.style.backgroundColor = '#ff0000';
+    statusText.innerText = 'Error: ' + err.message;
+    progressFill.style.backgroundColor = '#ef4444';
   } finally {
     exportBtn.disabled = false;
     manualBtn.disabled = false;
@@ -128,7 +128,7 @@ async function runExport(links: { title: string, url: string }[]) {
     const link = links[i];
     const percent = Math.round(((i + 1) / total) * 100);
     
-    updateProgress(percent, `FETCHING: ${link.title}`);
+    updateProgress(percent, `Downloading: ${link.title}`);
 
     const response = await fetch(link.url);
     const html = await response.text();
@@ -154,7 +154,7 @@ async function runExport(links: { title: string, url: string }[]) {
     }
   }
 
-  updateProgress(99, 'COMPILING ZIP...');
+  updateProgress(99, 'Generating ZIP file...');
   const content = await zip.generateAsync({ type: 'blob' });
   
   const url = URL.createObjectURL(content);
