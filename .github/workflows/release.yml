@@ -1,4 +1,4 @@
-name: Package Extension
+name: Release Extension
 
 on:
   push:
@@ -6,9 +6,11 @@ on:
       - main
 
 jobs:
-  build:
+  release:
     if: contains(github.event.head_commit.message, '[RELEASE]')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +32,31 @@ jobs:
           cd dist
           zip -r ../web2skill-extension.zip .
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: web2skill-release
-          path: web2skill-extension.zip
+          tag_name: v${{ steps.date.outputs.date }}
+          name: Web2Skill Release ${{ steps.date.outputs.date }}
+          files: web2skill-extension.zip
+          body: |
+            ## Web2Skill - Chrome Extension Release
+            
+            This release was automatically generated via GitHub Actions.
+            
+            ### Installation Instructions
+            1. Download the `web2skill-extension.zip` file from this release.
+            2. Extract the ZIP file to a folder on your computer.
+            3. Open Google Chrome and navigate to `chrome://extensions/`.
+            4. Enable **Developer mode** using the toggle in the top right corner.
+            5. Click the **Load unpacked** button.
+            6. Select the folder where you extracted the extension files.
+            7. The Web2Skill extension is now ready to use!
+            
+            ---
+            *Created with web2skill, from [Inled Group](https://inled.es)*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
