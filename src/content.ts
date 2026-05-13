@@ -86,8 +86,8 @@ function startManualSelection() {
     hoverOverlay.style.position = 'fixed';
     hoverOverlay.style.pointerEvents = 'none';
     hoverOverlay.style.zIndex = '999999';
-    hoverOverlay.style.border = '2px solid #00cc00';
-    hoverOverlay.style.backgroundColor = 'rgba(0, 204, 0, 0.1)';
+    hoverOverlay.style.border = '3px solid #ffffff';
+    hoverOverlay.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
     document.body.appendChild(hoverOverlay);
   }
 
@@ -97,16 +97,16 @@ function startManualSelection() {
     instructionBanner.style.top = '0';
     instructionBanner.style.left = '0';
     instructionBanner.style.right = '0';
-    instructionBanner.style.backgroundColor = '#0d0d0d';
-    instructionBanner.style.color = '#33ff33';
-    instructionBanner.style.padding = '12px';
+    instructionBanner.style.backgroundColor = '#000000';
+    instructionBanner.style.color = '#ffffff';
+    instructionBanner.style.padding = '14px';
     instructionBanner.style.textAlign = 'center';
-    instructionBanner.style.fontFamily = 'monospace';
+    instructionBanner.style.fontFamily = 'Courier New, Courier, monospace';
     instructionBanner.style.fontSize = '14px';
-    instructionBanner.style.fontWeight = 'bold';
-    instructionBanner.style.borderBottom = '1px solid #00cc00';
+    instructionBanner.style.fontWeight = '900';
+    instructionBanner.style.borderBottom = '3px solid #ffffff';
     instructionBanner.style.zIndex = '1000000';
-    instructionBanner.innerText = '> CLICK ON NAVIGATION COMPONENT TO SCAN | [ESC] TO ABORT';
+    instructionBanner.innerText = '[SELECT_TARGET_COMPONENT] | ESC_TO_CANCEL';
     document.body.appendChild(instructionBanner);
   }
 

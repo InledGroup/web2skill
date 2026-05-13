@@ -6,35 +6,38 @@
     <title>Web2Skill</title>
     <style>
       :root {
-        /* Terminal Theme (Default) */
-        --terminal-bg: #0d0d0d;
-        --terminal-header: #1a1a1a;
-        --terminal-text: #33ff33;
-        --terminal-text-muted: #1b8a1b;
-        --terminal-accent: #00cc00;
-        --terminal-border: #262626;
-        --terminal-radius: 4px;
-        --terminal-font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+        /* W2S Logo Inspired Theme (Default) */
+        --w2s-bg: #000000;
+        --w2s-header: #0a0a0a;
+        --w2s-text: #ffffff;
+        --w2s-text-muted: #888888;
+        --w2s-accent: #ffffff;
+        --w2s-border: #333333;
+        --w2s-radius: 0px; /* Blocky/Pixel style */
+        --w2s-font-header: 'Courier New', Courier, monospace;
+        --w2s-font-body: 'Courier New', Courier, monospace;
 
         /* Light Theme */
         --light-bg: #ffffff;
-        --light-header: #f1f5f9;
+        --light-header: #f8fafc;
         --light-text: #0f172a;
         --light-text-muted: #64748b;
-        --light-accent: #2563eb;
+        --light-accent: #000000;
         --light-border: #e2e8f0;
-        --light-radius: 8px;
-        --light-font: 'Inter', system-ui, sans-serif;
+        --light-radius: 4px;
+        --light-font-header: system-ui, sans-serif;
+        --light-font-body: system-ui, sans-serif;
 
         /* Active Vars */
-        --bg: var(--terminal-bg);
-        --header-bg: var(--terminal-header);
-        --text: var(--terminal-text);
-        --text-muted: var(--terminal-text-muted);
-        --accent: var(--terminal-accent);
-        --border: var(--terminal-border);
-        --radius: var(--terminal-radius);
-        --font: var(--terminal-font);
+        --bg: var(--w2s-bg);
+        --header-bg: var(--w2s-header);
+        --text: var(--w2s-text);
+        --text-muted: var(--w2s-text-muted);
+        --accent: var(--w2s-accent);
+        --border: var(--w2s-border);
+        --radius: var(--w2s-radius);
+        --font-header: var(--w2s-font-header);
+        --font-body: var(--w2s-font-body);
       }
 
       body.light-theme {
@@ -45,55 +48,58 @@
         --accent: var(--light-accent);
         --border: var(--light-border);
         --radius: var(--light-radius);
-        --font: var(--light-font);
+        --font-header: var(--light-font-header);
+        --font-body: var(--light-font-body);
       }
 
       body {
         width: 380px;
-        font-family: var(--font);
+        font-family: var(--font-body);
         padding: 0;
         margin: 0;
         background-color: var(--bg);
         color: var(--text);
-        transition: all 0.2s ease;
+        transition: background-color 0.2s;
       }
 
       .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 16px;
+        padding: 14px 16px;
         background-color: var(--header-bg);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 2px solid var(--border);
       }
 
       .header-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
       }
 
       .header img {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
+        image-rendering: pixelated;
       }
 
       .header h3 {
         margin: 0;
-        font-size: 16px;
-        font-weight: 700;
+        font-family: var(--font-header);
+        font-size: 18px;
+        font-weight: 900;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 1px;
       }
 
       #theme-toggle {
-        font-size: 10px;
+        font-size: 9px;
         background: transparent;
         border: 1px solid var(--border);
         color: var(--text-muted);
         padding: 4px 8px;
-        border-radius: 4px;
         cursor: pointer;
+        text-transform: uppercase;
       }
 
       .content {
@@ -102,15 +108,10 @@
 
       #status {
         font-size: 12px;
-        margin: 0 0 12px 0;
+        margin: 0 0 14px 0;
         color: var(--text);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      #status::before {
-        content: '>';
-        font-weight: bold;
+        border-left: 3px solid var(--accent);
+        padding-left: 10px;
       }
 
       #link-list {
@@ -119,27 +120,30 @@
         border: 1px solid var(--border);
         margin-bottom: 16px;
         padding: 4px;
-        border-radius: var(--radius);
-        background: rgba(0,0,0,0.2);
+        background: rgba(255, 255, 255, 0.03);
       }
 
       .link-item {
         display: flex;
         align-items: center;
-        padding: 6px 10px;
+        padding: 8px 10px;
         font-size: 12px;
-        border-radius: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .link-item:last-child {
+        border-bottom: none;
       }
       .link-item:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.08);
       }
       body.light-theme .link-item:hover {
-        background: var(--header-bg);
+        background: #f1f5f9;
       }
 
       .link-item input {
-        margin-right: 10px;
+        margin-right: 12px;
         accent-color: var(--accent);
+        cursor: pointer;
       }
 
       .progress-container {
@@ -147,14 +151,12 @@
         margin-bottom: 16px;
         padding: 12px;
         border: 1px solid var(--border);
-        border-radius: var(--radius);
       }
 
       .progress-bar {
         width: 100%;
-        height: 4px;
+        height: 6px;
         background-color: var(--border);
-        border-radius: 2px;
         overflow: hidden;
       }
 
@@ -168,27 +170,25 @@
         font-size: 10px;
         text-align: center;
         margin-top: 8px;
-        font-family: var(--font);
       }
 
       .actions {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
       }
 
       button.main-btn {
         width: 100%;
         padding: 12px;
-        border: 1px solid var(--accent);
+        border: 2px solid var(--accent);
         background: transparent;
         color: var(--accent);
-        font-family: var(--font);
+        font-family: var(--font-header);
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 900;
         cursor: pointer;
         text-transform: uppercase;
-        border-radius: var(--radius);
       }
 
       button.main-btn:hover:not(:disabled) {
@@ -203,16 +203,16 @@
       #manual-btn:hover:not(:disabled) {
         border-color: var(--text);
         color: var(--text);
-        background: transparent;
+        background: rgba(255, 255, 255, 0.1);
       }
 
       button:disabled {
-        opacity: 0.3;
+        opacity: 0.2;
         cursor: not-allowed;
       }
 
       .footer {
-        padding: 10px;
+        padding: 12px;
         font-size: 10px;
         text-align: center;
         color: var(--text-muted);
@@ -220,10 +220,10 @@
       }
       .footer a {
         color: var(--accent);
-        text-decoration: underline;
+        text-decoration: none;
+        border-bottom: 1px solid var(--text-muted);
       }
 
-      /* Manual Selection Banner */
       #selection-banner {
         display: none;
         position: fixed;
@@ -232,10 +232,10 @@
         right: 0;
         background: var(--accent);
         color: var(--bg);
-        padding: 10px;
+        padding: 12px;
         text-align: center;
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 900;
         z-index: 100;
       }
     </style>
@@ -244,13 +244,13 @@
     <div class="header">
       <div class="header-left">
         <img src="w2s.png" alt="W2S">
-        <h3>web2skill.sh</h3>
+        <h3>WEB2SKILL</h3>
       </div>
-      <button id="theme-toggle">Light Mode</button>
+      <button id="theme-toggle">LIGHT_MODE</button>
     </div>
     
     <div class="content">
-      <p id="status">Initializing scanner...</p>
+      <p id="status">SCANNING_DOCS...</p>
       
       <div id="link-list"></div>
       
@@ -262,17 +262,17 @@
       </div>
 
       <div class="actions">
-        <button id="export-btn" class="main-btn" disabled>_EXPORT_DOCS</button>
-        <button id="manual-btn" class="main-btn">_MANUAL_SELECT</button>
+        <button id="export-btn" class="main-btn" disabled>EXPORT_ZIP</button>
+        <button id="manual-btn" class="main-btn">SELECT_MANUALLY</button>
       </div>
     </div>
 
     <div class="footer">
-      $ ./inled-group --source-to-md
+      BY <a href="https://inled.es" target="_blank">INLED GROUP</a> | V1.0
     </div>
 
     <div id="selection-banner">
-      CLICK ON NAVIGATION ELEMENT TO SELECT
+      SELECT TARGET ELEMENT
     </div>
 
     <script type="module" src="/src/popup.ts"></script>
