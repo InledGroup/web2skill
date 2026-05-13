@@ -10,15 +10,31 @@ const statusText = document.getElementById('status')!;
 const progressContainer = document.getElementById('progress-container')!;
 const progressFill = document.getElementById('progress-fill')!;
 const progressLabel = document.getElementById('progress-text')!;
+const themeToggle = document.getElementById('theme-toggle') as HTMLButtonElement;
 
 let detectedLinks: { title: string; url: string }[] = [];
+
+// Theme Management
+chrome.storage.local.get(['theme'], (result) => {
+  if (result.theme === 'light') {
+    document.body.classList.add('light-theme');
+    themeToggle.innerText = 'Terminal Mode';
+  }
+});
+
+themeToggle.addEventListener('click', () => {
+  const isLight = document.body.classList.toggle('light-theme');
+  const theme = isLight ? 'light' : 'terminal';
+  themeToggle.innerText = isLight ? 'Terminal Mode' : 'Light Mode';
+  chrome.storage.local.set({ theme });
+});
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const activeTab = tabs[0];
   if (activeTab?.id) {
     chrome.tabs.sendMessage(activeTab.id, { action: 'detectNav' }, (response: any) => {
       if (chrome.runtime.lastError) {
-        statusText.innerText = 'Error: Please reload the page and try again.';
+        statusText.innerText = 'ERROR: RELOAD PAGE';
         return;
       }
       handleResponse(response);
@@ -30,10 +46,10 @@ function handleResponse(response: any) {
   if (response && response.links && response.links.length > 0) {
     detectedLinks = response.links;
     renderLinks(detectedLinks);
-    statusText.innerText = `${detectedLinks.length} pages detected.`;
+    statusText.innerText = `${detectedLinks.length} NODES DETECTED`;
     exportBtn.disabled = false;
   } else {
-    statusText.innerText = 'No clear navigation index found.';
+    statusText.innerText = 'SCAN FAILED: NO INDEX DETECTED';
   }
 }
 
@@ -75,7 +91,7 @@ exportBtn.addEventListener('click', async () => {
   }));
 
   if (selectedLinks.length === 0) {
-    alert('Please select at least one page.');
+    alert('SELECT AT LEAST ONE NODE');
     return;
   }
 
@@ -85,11 +101,11 @@ exportBtn.addEventListener('click', async () => {
   
   try {
     await runExport(selectedLinks);
-    statusText.innerText = 'Export completed successfully!';
-    progressLabel.innerText = '100% - Done';
+    statusText.innerText = 'EXPORT SUCCESSFUL';
+    progressLabel.innerText = '100% - COMPLETED';
   } catch (err: any) {
-    statusText.innerText = 'Error: ' + err.message;
-    progressFill.style.backgroundColor = '#ef4444';
+    statusText.innerText = 'CRITICAL ERROR: ' + err.message;
+    progressFill.style.backgroundColor = '#ff0000';
   } finally {
     exportBtn.disabled = false;
     manualBtn.disabled = false;
@@ -112,7 +128,7 @@ async function runExport(links: { title: string, url: string }[]) {
     const link = links[i];
     const percent = Math.round(((i + 1) / total) * 100);
     
-    updateProgress(percent, `Processing: ${link.title}`);
+    updateProgress(percent, `FETCHING: ${link.title}`);
 
     const response = await fetch(link.url);
     const html = await response.text();
@@ -138,7 +154,7 @@ async function runExport(links: { title: string, url: string }[]) {
     }
   }
 
-  updateProgress(99, 'Generating ZIP file...');
+  updateProgress(99, 'COMPILING ZIP...');
   const content = await zip.generateAsync({ type: 'blob' });
   
   const url = URL.createObjectURL(content);

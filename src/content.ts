@@ -1,5 +1,6 @@
 // content.ts
 let hoverOverlay: HTMLDivElement | null = null;
+let instructionBanner: HTMLDivElement | null = null;
 
 chrome.runtime.onMessage.addListener((request: any, _sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   if (request.action === 'detectNav') {
@@ -12,7 +13,6 @@ chrome.runtime.onMessage.addListener((request: any, _sender: chrome.runtime.Mess
 });
 
 function detectNavigationLinks(element: Element | Document = document) {
-  // Prioritize typical sidebar/doc navigation selectors over top-level nav
   const selectors = [
     'aside',
     '.sidebar',
@@ -23,7 +23,7 @@ function detectNavigationLinks(element: Element | Document = document) {
     '.menu-content',
     '.toc',
     '#toc',
-    'nav' // General nav as a fallback
+    'nav'
   ];
 
   let bestNav: Element | null = null;
@@ -33,7 +33,6 @@ function detectNavigationLinks(element: Element | Document = document) {
     const elements = element.querySelectorAll(selector);
     for (const el of elements) {
       const linkCount = el.querySelectorAll('a').length;
-      // We want the element with the most links that isn't the whole body
       if (linkCount > maxLinks && linkCount > 2) {
         maxLinks = linkCount;
         bestNav = el;
@@ -41,7 +40,6 @@ function detectNavigationLinks(element: Element | Document = document) {
     }
   }
 
-  // Fallback: If no high-quality nav found, look for any list with many links
   if (!bestNav || maxLinks < 5) {
     const lists = element.querySelectorAll('ul, ol, div');
     for (const list of lists) {
@@ -54,7 +52,6 @@ function detectNavigationLinks(element: Element | Document = document) {
   }
 
   if (!bestNav) return [];
-
   return extractLinks(bestNav);
 }
 
@@ -68,7 +65,6 @@ function extractLinks(container: Element) {
       try {
         if (!link.url || link.url.startsWith('javascript:')) return false;
         const url = new URL(link.url);
-        // Only same origin and actual pages (not just hash fragments of current page)
         return url.origin === window.location.origin && 
                (url.pathname !== window.location.pathname || url.search !== window.location.search);
       } catch (e) {
@@ -90,9 +86,28 @@ function startManualSelection() {
     hoverOverlay.style.position = 'fixed';
     hoverOverlay.style.pointerEvents = 'none';
     hoverOverlay.style.zIndex = '999999';
-    hoverOverlay.style.border = '2px solid #007bff';
-    hoverOverlay.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+    hoverOverlay.style.border = '2px solid #00cc00';
+    hoverOverlay.style.backgroundColor = 'rgba(0, 204, 0, 0.1)';
     document.body.appendChild(hoverOverlay);
+  }
+
+  if (!instructionBanner) {
+    instructionBanner = document.createElement('div');
+    instructionBanner.style.position = 'fixed';
+    instructionBanner.style.top = '0';
+    instructionBanner.style.left = '0';
+    instructionBanner.style.right = '0';
+    instructionBanner.style.backgroundColor = '#0d0d0d';
+    instructionBanner.style.color = '#33ff33';
+    instructionBanner.style.padding = '12px';
+    instructionBanner.style.textAlign = 'center';
+    instructionBanner.style.fontFamily = 'monospace';
+    instructionBanner.style.fontSize = '14px';
+    instructionBanner.style.fontWeight = 'bold';
+    instructionBanner.style.borderBottom = '1px solid #00cc00';
+    instructionBanner.style.zIndex = '1000000';
+    instructionBanner.innerText = '> CLICK ON NAVIGATION COMPONENT TO SCAN | [ESC] TO ABORT';
+    document.body.appendChild(instructionBanner);
   }
 
   const onMouseMove = (e: MouseEvent) => {
@@ -128,11 +143,13 @@ function startManualSelection() {
       hoverOverlay.remove();
       hoverOverlay = null;
     }
+    if (instructionBanner) {
+      instructionBanner.remove();
+      instructionBanner = null;
+    }
   };
 
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('click', onClick, true);
   document.addEventListener('keydown', onKeyDown);
-  
-  alert('Haz clic en el menú/índice que quieres exportar. ESC para cancelar.');
 }

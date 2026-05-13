@@ -6,177 +6,251 @@
     <title>Web2Skill</title>
     <style>
       :root {
-        --primary: #2563eb;
-        --primary-hover: #1d4ed8;
-        --bg: #ffffff;
-        --secondary-bg: #f8fafc;
-        --text: #1e293b;
-        --text-muted: #64748b;
-        --border: #e2e8f0;
-        --radius: 8px;
-        --success: #10b981;
+        /* Terminal Theme (Default) */
+        --terminal-bg: #0d0d0d;
+        --terminal-header: #1a1a1a;
+        --terminal-text: #33ff33;
+        --terminal-text-muted: #1b8a1b;
+        --terminal-accent: #00cc00;
+        --terminal-border: #262626;
+        --terminal-radius: 4px;
+        --terminal-font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+        /* Light Theme */
+        --light-bg: #ffffff;
+        --light-header: #f1f5f9;
+        --light-text: #0f172a;
+        --light-text-muted: #64748b;
+        --light-accent: #2563eb;
+        --light-border: #e2e8f0;
+        --light-radius: 8px;
+        --light-font: 'Inter', system-ui, sans-serif;
+
+        /* Active Vars */
+        --bg: var(--terminal-bg);
+        --header-bg: var(--terminal-header);
+        --text: var(--terminal-text);
+        --text-muted: var(--terminal-text-muted);
+        --accent: var(--terminal-accent);
+        --border: var(--terminal-border);
+        --radius: var(--terminal-radius);
+        --font: var(--terminal-font);
       }
+
+      body.light-theme {
+        --bg: var(--light-bg);
+        --header-bg: var(--light-header);
+        --text: var(--light-text);
+        --text-muted: var(--light-text-muted);
+        --accent: var(--light-accent);
+        --border: var(--light-border);
+        --radius: var(--light-radius);
+        --font: var(--light-font);
+      }
+
       body {
-        width: 360px;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        width: 380px;
+        font-family: var(--font);
         padding: 0;
         margin: 0;
         background-color: var(--bg);
         color: var(--text);
+        transition: all 0.2s ease;
       }
+
       .header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 16px;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background-color: var(--header-bg);
         border-bottom: 1px solid var(--border);
-        background-color: var(--secondary-bg);
       }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
       .header img {
-        width: 32px;
-        height: 32px;
-        border-radius: 4px;
+        width: 24px;
+        height: 24px;
       }
+
       .header h3 {
         margin: 0;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
-        letter-spacing: -0.025em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
+
+      #theme-toggle {
+        font-size: 10px;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
       .content {
         padding: 16px;
       }
+
       #status {
-        font-size: 13px;
-        color: var(--text-muted);
+        font-size: 12px;
         margin: 0 0 12px 0;
-        line-height: 1.4;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
+      #status::before {
+        content: '>';
+        font-weight: bold;
+      }
+
       #link-list {
-        max-height: 220px;
+        max-height: 200px;
         overflow-y: auto;
         border: 1px solid var(--border);
-        background-color: var(--bg);
         margin-bottom: 16px;
         padding: 4px;
         border-radius: var(--radius);
+        background: rgba(0,0,0,0.2);
       }
+
       .link-item {
         display: flex;
         align-items: center;
-        padding: 8px 12px;
-        margin-bottom: 2px;
-        font-size: 13px;
-        border-radius: 6px;
-        transition: background-color 0.15s;
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 4px;
       }
       .link-item:hover {
-        background-color: var(--secondary-bg);
+        background: rgba(255, 255, 255, 0.05);
       }
+      body.light-theme .link-item:hover {
+        background: var(--header-bg);
+      }
+
       .link-item input {
-        width: 16px;
-        height: 16px;
-        margin-right: 12px;
-        cursor: pointer;
-        accent-color: var(--primary);
+        margin-right: 10px;
+        accent-color: var(--accent);
       }
-      .link-item label {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        cursor: pointer;
-        font-weight: 500;
-      }
+
       .progress-container {
         display: none;
         margin-bottom: 16px;
-        background: var(--secondary-bg);
         padding: 12px;
-        border-radius: var(--radius);
         border: 1px solid var(--border);
+        border-radius: var(--radius);
       }
+
       .progress-bar {
         width: 100%;
-        height: 8px;
-        background-color: #e2e8f0;
-        border-radius: 4px;
+        height: 4px;
+        background-color: var(--border);
+        border-radius: 2px;
         overflow: hidden;
       }
+
       #progress-fill {
         width: 0%;
         height: 100%;
-        background-color: var(--primary);
-        transition: width 0.3s ease;
+        background-color: var(--accent);
       }
+
       #progress-text {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-muted);
+        font-size: 10px;
         text-align: center;
-        margin: 8px 0 0 0;
+        margin-top: 8px;
+        font-family: var(--font);
       }
+
       .actions {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-      }
-      button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: var(--radius);
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         gap: 8px;
       }
-      #export-btn {
-        background-color: var(--primary);
-        color: white;
+
+      button.main-btn {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--accent);
+        background: transparent;
+        color: var(--accent);
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        border-radius: var(--radius);
       }
-      #export-btn:hover:not(:disabled) {
-        background-color: var(--primary-hover);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+      button.main-btn:hover:not(:disabled) {
+        background: var(--accent);
+        color: var(--bg);
       }
+
       #manual-btn {
-        background-color: transparent;
-        color: var(--text);
-        border: 1px solid var(--border);
+        border-color: var(--text-muted);
+        color: var(--text-muted);
       }
       #manual-btn:hover:not(:disabled) {
-        background-color: var(--secondary-bg);
-        border-color: #cbd5e1;
+        border-color: var(--text);
+        color: var(--text);
+        background: transparent;
       }
+
       button:disabled {
-        opacity: 0.6;
+        opacity: 0.3;
         cursor: not-allowed;
       }
+
       .footer {
-        padding: 12px 16px;
-        font-size: 11px;
+        padding: 10px;
+        font-size: 10px;
         text-align: center;
         color: var(--text-muted);
         border-top: 1px solid var(--border);
       }
       .footer a {
-        color: var(--primary);
-        text-decoration: none;
+        color: var(--accent);
+        text-decoration: underline;
+      }
+
+      /* Manual Selection Banner */
+      #selection-banner {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--accent);
+        color: var(--bg);
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 100;
       }
     </style>
   </head>
   <body>
     <div class="header">
-      <img src="w2s.png" alt="W2S">
-      <h3>Web2Skill</h3>
+      <div class="header-left">
+        <img src="w2s.png" alt="W2S">
+        <h3>web2skill.sh</h3>
+      </div>
+      <button id="theme-toggle">Light Mode</button>
     </div>
     
     <div class="content">
-      <p id="status">Detecting navigation links...</p>
+      <p id="status">Initializing scanner...</p>
       
       <div id="link-list"></div>
       
@@ -188,13 +262,17 @@
       </div>
 
       <div class="actions">
-        <button id="export-btn" disabled>Export Selection</button>
-        <button id="manual-btn">Manual Selection</button>
+        <button id="export-btn" class="main-btn" disabled>_EXPORT_DOCS</button>
+        <button id="manual-btn" class="main-btn">_MANUAL_SELECT</button>
       </div>
     </div>
 
     <div class="footer">
-      From <a href="https://inled.es" target="_blank">Inled Group</a>
+      $ ./inled-group --source-to-md
+    </div>
+
+    <div id="selection-banner">
+      CLICK ON NAVIGATION ELEMENT TO SELECT
     </div>
 
     <script type="module" src="/src/popup.ts"></script>
